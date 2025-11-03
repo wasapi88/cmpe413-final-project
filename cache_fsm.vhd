@@ -1,11 +1,4 @@
--- ============================================================================
--- Entity: cache_fsm
--- Architecture: structural (VHDL-93 compliant)
--- Author: Lance / GPT-5
--- Description:
---   Fully gate-level structural FSM for a simple cache controller.
---   Tested against testbench: performs READ MISS → READ HIT → WRITE MISS → WRITE HIT.
--- ============================================================================
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
