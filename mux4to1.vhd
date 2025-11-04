@@ -1,9 +1,8 @@
 --
 -- Entity: mux4to1
 -- Architecture: structural
--- Description : 4-to-1 multiplexer built using 2:1 selector gates
--- Author      : Lance
--- Date        : 2025-11-03
+-- Author: Lance Boac
+-- Date: 2025-11-03
 --
 
 library IEEE;
@@ -11,39 +10,53 @@ use IEEE.std_logic_1164.all;
 
 entity mux4to1 is
   port (
-    a, b, c, d : in  std_logic;           -- data inputs
-    sel        : in  std_logic_vector(1 downto 0); -- select lines
-    y          : out std_logic            -- output
+    a, b, c, d : in  std_logic;
+    sel        : in  std_logic_vector(1 downto 0);
+    y          : out std_logic
   );
-end entity mux4to1;
+end entity;
 
 architecture structural of mux4to1 is
 
-  
-  -- Component declarations
-  
-  component selector
-    port (
-      a, b, sel : in  std_logic;
-      y         : out std_logic
-    );
+  component and2
+    port (input1, input2 : in std_logic; output : out std_logic);
   end component;
 
-  
+  component inverter
+    port (input : in std_logic; output : out std_logic);
+  end component;
+
+  component or2
+    port (input1, input2 : in std_logic; output : out std_logic);
+  end component;
+
   -- Internal signals
-  
-  signal y_low, y_high : std_logic;
+  signal nsel0, nsel1 : std_logic;
+  signal s00, s01, s10, s11 : std_logic;
+  signal and_a, and_b, and_c, and_d : std_logic;
+  signal or_ab, or_cd : std_logic;
 
 begin
-  
-  -- First stage (two 2:1 muxes)
-  
-  mux_low  : selector port map(a => a, b => b, sel => sel(0), y => y_low);
-  mux_high : selector port map(a => c, b => d, sel => sel(0), y => y_high);
 
-  
-  -- Second stage (final 2:1 mux)
-  
-  mux_final : selector port map(a => y_low, b => y_high, sel => sel(1), y => y);
+  -- Invert select lines
+  u_inv0 : inverter port map(input => sel(0), output => nsel0);
+  u_inv1 : inverter port map(input => sel(1), output => nsel1);
 
-end architecture structural;
+  -- Decode select terms
+  and_s00 : and2 port map(input1 => nsel1, input2 => nsel0, output => s00);  -- 00
+  and_s01 : and2 port map(input1 => nsel1, input2 => sel(0),  output => s01); -- 01
+  and_s10 : and2 port map(input1 => sel(1),  input2 => nsel0, output => s10); -- 10
+  and_s11 : and2 port map(input1 => sel(1),  input2 => sel(0),  output => s11); -- 11
+
+  -- AND each input with its decoded select
+  u_and_a : and2 port map(input1 => a, input2 => s00, output => and_a);
+  u_and_b : and2 port map(input1 => b, input2 => s01, output => and_b);
+  u_and_c : and2 port map(input1 => c, input2 => s10, output => and_c);
+  u_and_d : and2 port map(input1 => d, input2 => s11, output => and_d);
+
+  -- Combine results with ORs
+  u_or1 : or2 port map(input1 => and_a, input2 => and_b, output => or_ab);
+  u_or2 : or2 port map(input1 => and_c, input2 => and_d, output => or_cd);
+  u_or3 : or2 port map(input1 => or_ab, input2 => or_cd, output => y);
+
+end structural;
