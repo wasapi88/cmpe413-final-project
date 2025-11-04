@@ -2,7 +2,7 @@
 -- Entity: cache
 -- Architecture: structural
 -- Description: 1 cache block consisting of a valid bit, 2-bit index, and 4 data bytes (32 bits)
--- Author: Lance Boac (revised)
+-- Author: Lance Boac
 -- Created On: 10/23/2025
 --
 
