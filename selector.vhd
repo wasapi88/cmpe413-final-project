@@ -1,7 +1,7 @@
 --
 -- Entity: selector
 -- Architecture: structural
--- Author: Lance Boac
+-- Author: Lance Boac and Emily Bearden
 -- Created On: 10/21/2025
 --
 
