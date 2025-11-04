@@ -2,7 +2,7 @@
 -- Entity: tag_valid
 -- Architecture: structural
 -- Description : Structural 2-bit tag store with valid bits (4 entries)
--- Author      : Lance
+-- Author      : Lance Boac and Emily Bearden
 -- Date        : 2025-11-03
 --
 
