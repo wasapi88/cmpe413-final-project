@@ -2,7 +2,7 @@
 -- Entity: cache_array
 -- Architecture: structural
 -- Description : Gate-level cache array with 4 lines × 4 bytes/line
--- Author      : Lance
+-- Author      : Lance Boac and Emily Bearden
 -- Date        : 2025-11-03
 --
 
