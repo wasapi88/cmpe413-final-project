@@ -107,7 +107,6 @@ begin
       tag_match => tag_hit
     );
 
-  -- === NEW LOGIC ===
   -- Fill detection
   fill_active <= '1' when md_stb /= "0000" else '0';
 
