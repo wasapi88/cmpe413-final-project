@@ -1,7 +1,7 @@
 --
 -- Entity: mux4to1
 -- Architecture: structural
--- Author: Lance Boac
+-- Author: Lance Boac and Emily Bearden
 -- Date: 2025-11-03
 --
 
