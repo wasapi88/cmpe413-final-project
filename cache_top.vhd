@@ -14,13 +14,11 @@ entity cache_top is
     MA          : out std_logic_vector(5 downto 0);
     MD          : in  std_logic_vector(7 downto 0);
     mem_enable  : out std_logic;
-    state_debug : out std_logic_vector(9 downto 0)  -- Added for waveform visibility
+    state_debug : out std_logic_vector(9 downto 0)
   );
 end entity;
 
 architecture structural of cache_top is
-
-  -- Components
 
   component cache_fsm is
     port (
@@ -59,9 +57,7 @@ architecture structural of cache_top is
     );
   end component;
 
-
   -- Internal wiring
-
   signal tag_hit        : std_logic;
   signal out_en         : std_logic;
   signal cache_we       : std_logic;
@@ -74,6 +70,11 @@ architecture structural of cache_top is
   alias tag_bits   : std_logic_vector(1 downto 0) is CA(5 downto 4);
   alias index_bits : std_logic_vector(1 downto 0) is CA(3 downto 2);
   alias byte_bits  : std_logic_vector(1 downto 0) is CA(1 downto 0);
+
+  -- New helper signals
+  signal fill_active       : std_logic;
+  signal cache_data_in     : std_logic_vector(7 downto 0);
+  signal byte_sel_effective: std_logic_vector(1 downto 0);
 
 begin
 
@@ -95,7 +96,6 @@ begin
       state_debug     => state_debug
     );
 
-
   u_tag : tag_valid
     port map (
       clk       => clk,
@@ -107,22 +107,29 @@ begin
       tag_match => tag_hit
     );
 
+  -- === NEW LOGIC ===
+  -- Fill detection
+  fill_active <= '1' when md_stb /= "0000" else '0';
+
+  -- Data source mux
+  cache_data_in <= MD when fill_active = '1' else CD_in;
+
+  -- Byte select mux
+  byte_sel_effective <= cache_sel when fill_active = '1' else byte_bits;
 
   -- Cache Array
-
   u_cache : cache_array
     port map (
       clk       => clk,
       we        => cache_we,
       index     => index_bits,
-      byte_sel  => cache_sel,
-      data_in   => MD,       -- from memory during fill
+      byte_sel  => byte_sel_effective,
+      data_in   => cache_data_in,
       data_out  => cache_data_out
     );
 
-
   -- External buses
-
   CD_out <= cache_data_out when out_en = '1' else (others => 'Z');
-  MA     <= tag_bits & index_bits & "00";  -- points to block base per spec
+  MA     <= tag_bits & index_bits & "00";
+
 end architecture;
